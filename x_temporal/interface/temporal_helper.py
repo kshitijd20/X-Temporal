@@ -43,7 +43,7 @@ class TemporalHelper(object):
         self._ready()
         self._last_time = time.time()
         self.logger.info('Running with config:\n{}'.format(format_cfg(self.config)))
-    
+
     def _resume(self, ckpt=None):
         """load state from given checkpoint or from pretrain_model/resume_model
         """
@@ -67,7 +67,7 @@ class TemporalHelper(object):
         self.data_loaders = self._build_dataloaders()
         self.model = self.build_model()
         self.criterion = self.build_criterion()
-        
+
         if not self.inference_only:
             self.optimizer = build_optimizer(self.config.trainer.optimizer, self.model)
             self.lr_scheduler = build_scheduler(
@@ -151,8 +151,8 @@ class TemporalHelper(object):
             sampler = DistributedSampler(dataset) if self.config.gpus  > 1 else None
             val_loader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size=dargs.batch_size, shuffle=(False if sampler else True), 
-                drop_last=False, num_workers=dargs.workers, 
+                batch_size=dargs.batch_size, shuffle=(False if sampler else True),
+                drop_last=False, num_workers=dargs.workers,
                 pin_memory=True, sampler=sampler)
             return val_loader
 
@@ -183,7 +183,7 @@ class TemporalHelper(object):
 
     def _ready(self):
         self.model = self.model.cuda()
-    
+
     def build_model(self):
         model = get_model(self.config).cuda()
         return model
@@ -212,7 +212,7 @@ class TemporalHelper(object):
             shuffle_dataset(self.data_loaders[batch_type], self.cur_epoch)
             iterator = self.data_iterators[batch_type] = iter(self.data_loaders[batch_type])
             batch = next(iterator)
-	
+
         batch[0] = batch[0].cuda(non_blocking=True)
         batch[1] = batch[1].cuda(non_blocking=True)
 
@@ -290,7 +290,7 @@ class TemporalHelper(object):
                 all_reduce(reduced_prec5)
             self.metrics['top1'].update(reduced_prec1.item())
             self.metrics['top5'].update(reduced_prec5.item())
-    
+
     def reset_metrics(self):
         for key in self.metrics:
             self.metrics[key].reset()
@@ -315,15 +315,15 @@ class TemporalHelper(object):
                 if self.multi_class:
                     self.tb_logger.add_scalar('mAP_train', self.metrics['mAP'].avg, iter_idx)
                     self.logger.info(log_formatter.format(
-                        iter_idx, self.max_iter, self.cur_epoch + 1, self.config.trainer.epochs, 
-                        batch_time=self.metrics['batch_time'], data_time=self.metrics['data_time'], loss=self.metrics['losses'], 
+                        iter_idx, self.max_iter, self.cur_epoch + 1, self.config.trainer.epochs,
+                        batch_time=self.metrics['batch_time'], data_time=self.metrics['data_time'], loss=self.metrics['losses'],
                         mAP=self.metrics['mAP'], lr=self.lr_scheduler.get_lr()[0]))
                 else:
                     self.tb_logger.add_scalar('acc1_train', self.metrics['top1'].avg, iter_idx)
                     self.tb_logger.add_scalar('acc5_train', self.metrics['top5'].avg, iter_idx)
                     self.logger.info(log_formatter.format(
-                        iter_idx, self.max_iter, self.cur_epoch + 1, self.config.trainer.epochs, 
-                        batch_time=self.metrics['batch_time'], data_time=self.metrics['data_time'], loss=self.metrics['losses'], 
+                        iter_idx, self.max_iter, self.cur_epoch + 1, self.config.trainer.epochs,
+                        batch_time=self.metrics['batch_time'], data_time=self.metrics['data_time'], loss=self.metrics['losses'],
                         top1=self.metrics['top1'], top5=self.metrics['top5'], lr=self.lr_scheduler.get_lr()[0]))
 
             if (iter_idx == self.max_iter - 1) or (iter_idx % self.epoch_iters == 0 and iter_idx > 0 and \
@@ -352,7 +352,7 @@ class TemporalHelper(object):
 
                 if self.multi_class:
                     self.logger.info(' * Best mAP {:.3f}'.format(self.best_prec1))
-                else:        
+                else:
                     self.logger.info(' * Best Prec@1 {:.3f}'.format(self.best_prec1))
 
 
@@ -361,7 +361,7 @@ class TemporalHelper(object):
     def save_checkpoint(self, state, is_best):
         torch.save(state, os.path.join(self.work_dir, self.config.saver.save_dir, 'ckpt.pth.tar'))
         if is_best:
-            shutil.copyfile(os.path.join(self.work_dir, self.config.saver.save_dir, 'ckpt.pth.tar'), 
+            shutil.copyfile(os.path.join(self.work_dir, self.config.saver.save_dir, 'ckpt.pth.tar'),
                     os.path.join(self.work_dir, self.config.saver.save_dir, 'ckpt_best.pth.tar'))
 
     @torch.no_grad()
@@ -433,7 +433,7 @@ class TemporalHelper(object):
             all_reduce(total_num, False)
             all_reduce(loss_sum,  False)
         final_loss = loss_sum.item()/total_num.item()
-        
+
         if self.multi_class:
             mAP_sum = torch.Tensor([mAPs.avg*mAPs.count]).cuda()
             if self.config.gpus > 1:
@@ -457,6 +457,37 @@ class TemporalHelper(object):
         self.model.cuda().train()
         return metric
 
+@torch.no_grad()
+def extract_activations(self,activations_dir):
+    batch_time = AverageMeter(0)
+    losses = AverageMeter(0)
+
+    spatial_crops = 1
+    temporal_samples = 1
+    dup_samples = spatial_crops * temporal_samples
+
+    self.model.cuda().eval()
+    test_loader = self.data_loaders['test']
+    test_len = len(test_loader)
+    end = time.time()
+    for iter_idx in range(test_len):
+        inputs = self.get_batch('test')
+        isizes = inputs[0].shape
+
+        if self.config.net.model_type == '2D':
+            inputs[0] = inputs[0].view(
+                isizes[0] * dup_samples, -1, isizes[2], isizes[3])
+        else:
+            inputs[0] = inputs[0].view(
+                isizes[0], isizes[1], dup_samples, -1, isizes[3], isizes[4]
+                    )
+            inputs[0] = inputs[0].permute(0, 2, 1, 3, 4, 5).contiguous()
+            inputs[0] = inputs[0].view(isizes[0] * dup_samples, isizes[1], -1, isizes[3], isizes[4])
+
+        activations, output = self.model(inputs[0],return_activations = True)
+        osizes = output.shape
+    return metric
+
     def load_pretrain_or_resume(self):
         if 'resume_model' in self.config.saver:
             self.logger.info('Load checkpoint from {}'.format(self.config.saver['resume_model']))
@@ -468,4 +499,3 @@ class TemporalHelper(object):
         else:
             self.logger.info('Load nothing! No weights provided {}')
             return None
-
