@@ -54,7 +54,7 @@ class Bottleneck(nn.Module):
 class SlowFast(nn.Module):
     def __init__(self, block=Bottleneck, layers=[3, 4, 6, 3], num_classes=700, dropout=0.5,
                  sample_duration=0, sample_size=112):
-            
+
         super(SlowFast, self).__init__()
 
 
@@ -96,31 +96,48 @@ class SlowFast(nn.Module):
         self.dp = nn.Dropout(dropout)
         self.fc = nn.Linear(self.fast_inplanes+2048, num_classes, bias=False)
 
-    def forward(self, input):
+    def forward(self, input, return_activations=False):
         fast, lateral = self.FastPath(input[:, :, ::1, :, :])
-        slow = self.SlowPath(input[:, :, ::4, :, :], lateral)
+        if return_activations:
+            activations,slow = self.SlowPath(input[:, :, ::4, :, :], lateral,return_activations=return_activations)
+        else:
+            slow = self.SlowPath(input[:, :, ::4, :, :], lateral,return_activations=return_activations)
         x = torch.cat([slow, fast], dim=1)
         x = self.dp(x)
         x = self.fc(x)
+        if return_activations:
+            activations.append(x)
+            return activations,x
         return x
 
 
 
-    def SlowPath(self, input, lateral):
+    def SlowPath(self, input, lateral, return_activations=False):
+        activations = []
         x = self.slow_conv1(input)
         x = self.slow_bn1(x)
         x = self.slow_relu(x)
         x = self.slow_maxpool(x)
         x = torch.cat([x, lateral[0]],dim=1)
         x = self.slow_res2(x)
+        if return_activations:
+            activations.append(x)
         x = torch.cat([x, lateral[1]],dim=1)
         x = self.slow_res3(x)
+        if return_activations:
+            activations.append(x)
         x = torch.cat([x, lateral[2]],dim=1)
         x = self.slow_res4(x)
+        if return_activations:
+            activations.append(x)
         x = torch.cat([x, lateral[3]],dim=1)
         x = self.slow_res5(x)
+        if return_activations:
+            activations.append(x)
         x = nn.AdaptiveAvgPool3d(1)(x)
         x = x.view(-1, x.size(1))
+        if return_activations:
+            return activations,x
         return x
 
     def FastPath(self, input):
