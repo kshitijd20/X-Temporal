@@ -62,4 +62,4 @@ config:
   saver:
     save_dir: 'checkpoint/'
     #pretrain_model: '/path'
-    resume_model: '/home/kshitijd/projects/X-Temporal/checkpoints/tin_k700_res101_8.pth.tar'
+    resume_model: '/home/kshitijd/projects/X-Temporal/checkpoints/tin_k700_res101.pth.tar'
