@@ -59,4 +59,4 @@ config:
   saver:
     save_dir: 'checkpoints/'
     #pretrain_model: '/path'
-    resume_model: '/home/kshitijd/projects/X-Temporal/checkpoints/slowfast_mit_101.pth.tar'
+    resume_model: '/home/kshitijd/projects/X-Temporal/checkpoints/slowfast_k700_101.pth.tar'
