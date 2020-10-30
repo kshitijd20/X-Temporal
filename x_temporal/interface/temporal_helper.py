@@ -55,6 +55,7 @@ class TemporalHelper(object):
 
         # load model weights
         load_state_dict(self.model, ckpt['model'], strict=False)
+        print("-----------------------model checkpoint loaded -----------------------------------------------------")
         if not self.inference_only:
             if 'optimizer' in ckpt:
                 self.start_iter = ckpt['epoch'] * self.epoch_iters
