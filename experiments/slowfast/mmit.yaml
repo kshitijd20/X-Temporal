@@ -1,9 +1,9 @@
 version: 1.0
 config:
-  gpus: 8
+  gpus: 1
   seed: 2020
   dataset:
-    workers: 3
+    workers: 1
     num_class: 600
     num_segments: 32
     batch_size: 1
