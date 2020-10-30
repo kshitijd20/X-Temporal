@@ -26,6 +26,8 @@ def main():
 
     config = EasyDict(config['config'])
     temporal_helper = TemporalHelper(config, inference_only=True)
+    if not os.path.exists(args.activations_dir):
+        os.makedirs(args.activations_dir)
     temporal_helper.extract_activations(args.activations_dir)
 
 

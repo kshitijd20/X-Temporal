@@ -471,7 +471,7 @@ class TemporalHelper(object):
         test_len = len(test_loader)
         end = time.time()
         layer_list = ['s1', 's2','s3', 's4','s5']
-        print("Number of videos are :", )
+        print("Number of videos are :",test_len )
         for iter_idx in tqdm(range(test_len)):
             inputs = self.get_batch('test')
             isizes = inputs[0].shape
