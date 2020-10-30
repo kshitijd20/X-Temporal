@@ -24,7 +24,7 @@ from x_temporal.utils.dataset_helper import get_val_crop_transform, get_dataset,
 from x_temporal.core.models_entry import get_model, get_augmentation
 from x_temporal.core.transforms import *
 from x_temporal.core.dataset import VideoDataSet
-
+from tqdm import tqdm
 
 class TemporalHelper(object):
     def __init__(self, config, work_dir='./', ckpt_dict=None, inference_only=False):
@@ -470,7 +470,9 @@ class TemporalHelper(object):
         test_loader = self.data_loaders['test']
         test_len = len(test_loader)
         end = time.time()
-        for iter_idx in range(test_len):
+        layer_list = ['s1', 's2','s3', 's4','s5']
+        print("Number of videos are :", )
+        for iter_idx in tqdm(range(test_len)):
             inputs = self.get_batch('test')
             isizes = inputs[0].shape
 
@@ -485,8 +487,10 @@ class TemporalHelper(object):
                 inputs[0] = inputs[0].view(isizes[0] * dup_samples, isizes[1], -1, isizes[3], isizes[4])
 
             activations, output = self.model(inputs[0],return_activations = True)
-            for activation in activations:
-                print(activation.shape)
+            for layer,activation in zip(layer_list,activations):
+                activations_save_path = os.path.join(activations_dir,str(iter_idx).zfill(4) + "_" + layer + ".npy")
+                print(iter_idx, activation.shape)
+                np.save(activations_save_path,activation.cpu().detach().numpy())
             osizes = output.shape
         return None
 
