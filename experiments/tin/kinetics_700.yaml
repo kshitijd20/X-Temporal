@@ -6,7 +6,7 @@ config:
     workers: 1
     num_class: 174
     num_segments: 8
-    batch_size: 8
+    batch_size: 1
     img_prefix: '{:05d}.jpg'
     video_source: True
     dense_sample: False
