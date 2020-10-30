@@ -457,36 +457,38 @@ class TemporalHelper(object):
         self.model.cuda().train()
         return metric
 
-@torch.no_grad()
-def extract_activations(self,activations_dir):
-    batch_time = AverageMeter(0)
-    losses = AverageMeter(0)
+    @torch.no_grad()
+    def extract_activations(self,activations_dir):
+        batch_time = AverageMeter(0)
+        losses = AverageMeter(0)
 
-    spatial_crops = 1
-    temporal_samples = 1
-    dup_samples = spatial_crops * temporal_samples
+        spatial_crops = 1
+        temporal_samples = 1
+        dup_samples = spatial_crops * temporal_samples
 
-    self.model.cuda().eval()
-    test_loader = self.data_loaders['test']
-    test_len = len(test_loader)
-    end = time.time()
-    for iter_idx in range(test_len):
-        inputs = self.get_batch('test')
-        isizes = inputs[0].shape
+        self.model.cuda().eval()
+        test_loader = self.data_loaders['test']
+        test_len = len(test_loader)
+        end = time.time()
+        for iter_idx in range(test_len):
+            inputs = self.get_batch('test')
+            isizes = inputs[0].shape
 
-        if self.config.net.model_type == '2D':
-            inputs[0] = inputs[0].view(
-                isizes[0] * dup_samples, -1, isizes[2], isizes[3])
-        else:
-            inputs[0] = inputs[0].view(
-                isizes[0], isizes[1], dup_samples, -1, isizes[3], isizes[4]
-                    )
-            inputs[0] = inputs[0].permute(0, 2, 1, 3, 4, 5).contiguous()
-            inputs[0] = inputs[0].view(isizes[0] * dup_samples, isizes[1], -1, isizes[3], isizes[4])
+            if self.config.net.model_type == '2D':
+                inputs[0] = inputs[0].view(
+                    isizes[0] * dup_samples, -1, isizes[2], isizes[3])
+            else:
+                inputs[0] = inputs[0].view(
+                    isizes[0], isizes[1], dup_samples, -1, isizes[3], isizes[4]
+                        )
+                inputs[0] = inputs[0].permute(0, 2, 1, 3, 4, 5).contiguous()
+                inputs[0] = inputs[0].view(isizes[0] * dup_samples, isizes[1], -1, isizes[3], isizes[4])
 
-        activations, output = self.model(inputs[0],return_activations = True)
-        osizes = output.shape
-    return metric
+            activations, output = self.model(inputs[0],return_activations = True)
+            for activation in activations:
+                print(activation.shape)
+            osizes = output.shape
+        return None
 
     def load_pretrain_or_resume(self):
         if 'resume_model' in self.config.saver:
