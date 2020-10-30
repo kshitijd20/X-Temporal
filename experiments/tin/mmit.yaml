@@ -26,7 +26,7 @@ config:
       meta_file: /home/kshitijd/projects/X-Temporal/tools/Output.txt
 
   net:
-    arch: resnet50
+    arch: resnet101
     model_type: 2D
     tin: True
     shift_div: 4
