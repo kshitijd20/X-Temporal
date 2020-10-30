@@ -2,6 +2,7 @@ import argparse
 import yaml
 from easydict import EasyDict
 import torch
+import os 
 
 from x_temporal.interface.temporal_helper import TemporalHelper
 from x_temporal.utils.multiprocessing import mrun
