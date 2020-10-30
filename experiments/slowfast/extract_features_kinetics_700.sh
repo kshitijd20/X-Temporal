@@ -1,7 +1,7 @@
 T=`date +%m%d%H%M`
 ROOT=../..
 cfg=kinetics_700.yaml
-ad = '/scratch/kshitijd/Algonauts2020/activations/slowfast101_Kinetics700'
+ad='/scratch/kshitijd/Algonauts2020/activations/slowfast101_Kinetics700'
 
 export PYTHONPATH=$ROOT:$PYTHONPATH
 

@@ -1,7 +1,7 @@
 T=`date +%m%d%H%M`
 ROOT=../..
 cfg=mmit.yaml
-ad = '/scratch/kshitijd/Algonauts2020/activations/slowfast101_MMIT'
+ad='/scratch/kshitijd/Algonauts2020/activations/slowfast101_MMIT'
 
 export PYTHONPATH=$ROOT:$PYTHONPATH
 
