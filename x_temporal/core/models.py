@@ -184,18 +184,24 @@ class TSN(nn.Module):
     def partialBN(self, enable):
         self._enable_pbn = enable
 
-    def forward(self, input, no_reshape=False):
+    def forward(self, input, no_reshape=False, return_activations=False):
         if not no_reshape:
             sample_len = (3 if self.modality == "RGB" else 2) * self.new_length
 
             if self.modality == 'RGBDiff':
                 sample_len = 3 * self.new_length
                 input = self._get_diff(input)
-
-            base_out = self.base_model(input.view(
-                (-1, sample_len) + input.size()[-2:]))
+            if return_activations:
+                activations, base_out = self.base_model(input.view(
+                    (-1, sample_len) + input.size()[-2:]),return_activations=return_activations)
+            else:
+                base_out = self.base_model(input.view(
+                    (-1, sample_len) + input.size()[-2:]))
         else:
-            base_out = self.base_model(input)
+            if return_activations:
+                activations, base_out =  self.base_model(input,return_activations=return_activations)
+            else:
+                base_out = self.base_model(input)
 
         if self.dropout > 0:
             base_out = self.new_fc(base_out)
@@ -211,6 +217,8 @@ class TSN(nn.Module):
                 base_out = base_out.view(
                     (-1, self.num_segments) + base_out.size()[1:])
             output = self.consensus(base_out)
+            if return_activations:
+                return activations, output.squeeze(1)
             return output.squeeze(1)
 
     def _get_diff(self, input, keep_rgb=False):
