@@ -130,6 +130,7 @@ class VideoDataSet(data.Dataset):
         if not self.test_mode or self.remove_missing:
             tmp = [item for item in tmp if int(item[1]) >= 3]
         self.video_list = [VideoRecord(item) for item in tmp]
+        print(self.video_list)
 
         if self.image_tmpl == '{:06d}-{}_{:ample_ind/5d}.jpg':
             for v in self.video_list:
