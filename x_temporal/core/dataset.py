@@ -306,6 +306,7 @@ class VideoDataSet(data.Dataset):
                 seg_imgs = self._load_image(path, p)
                 images.extend(seg_imgs)
         else:
+            print(os.path.join(self.root_path,record.path))
             vr = VideoReader(
                 os.path.join(
                     self.root_path,
