@@ -473,7 +473,7 @@ class TemporalHelper(object):
         end = time.time()
         layer_list = ['s1', 's2','s3', 's4','s5']
         print("Number of videos are :",test_len )
-        for iter_idx in tqdm(range(test_len)):
+        for iter_idx in (range(test_len)):
             inputs = self.get_batch('test')
             isizes = inputs[0].shape
 
@@ -490,7 +490,7 @@ class TemporalHelper(object):
             activations, output = self.model(inputs[0],return_activations = True)
             for layer,activation in zip(layer_list,activations):
                 activations_save_path = os.path.join(activations_dir,str(iter_idx).zfill(4) + "_" + layer + ".npy")
-                print(iter_idx, activation.shape)
+                #print(iter_idx, activation.shape)
                 np.save(activations_save_path,activation.cpu().detach().numpy())
             osizes = output.shape
         return None

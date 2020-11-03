@@ -243,7 +243,7 @@ class VideoDataSet(data.Dataset):
         # check this is a legit video folder
         if self.video_source:
             full_path = os.path.join(self.root_path, record.path)
-
+            print("full path is ", full_path)
             while not os.path.exists(full_path):
                 logger.info(
                     '################## Not Found: %s' %
