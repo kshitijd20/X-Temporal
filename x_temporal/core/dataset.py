@@ -243,6 +243,7 @@ class VideoDataSet(data.Dataset):
         # check this is a legit video folder
         if self.video_source:
             full_path = os.path.join(self.root_path, record.path)
+
             while not os.path.exists(full_path):
                 logger.info(
                     '################## Not Found: %s' %
@@ -250,7 +251,9 @@ class VideoDataSet(data.Dataset):
                         self.root_path,
                         record.path))
                 index = np.random.randint(len(self.video_list))
+                print(self.video_list[index])
                 record = self.video_list[index]
+                print(self.video_list[index])
                 full_path = os.path.join(self.root_path, record.path)
         else:
             if self.image_tmpl == 'flow_{}_{:05d}.jpg':
