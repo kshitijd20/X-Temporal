@@ -129,9 +129,9 @@ class VideoDataSet(data.Dataset):
         tmp = [x.strip().split(' ') for x in open(self.list_file)]
         if not self.test_mode or self.remove_missing:
             tmp = [item for item in tmp if int(item[1]) >= 3]
-        print("Video list is ",tmp)
+        #print("Video list is ",tmp)
         self.video_list = [VideoRecord(item) for item in tmp]
-        print("Video list is ", self.video_list)
+        #print("Video list is ", self.video_list)
 
         if self.image_tmpl == '{:06d}-{}_{:ample_ind/5d}.jpg':
             for v in self.video_list:
@@ -240,12 +240,13 @@ class VideoDataSet(data.Dataset):
             return t_offsets
 
     def __getitem__(self, index):
+        print("index is ", index)
         record = self.video_list[index]
 
         # check this is a legit video folder
         if self.video_source:
             full_path = os.path.join(self.root_path, record.path)
-            print("full path is ", full_path)
+            #print("full path is ", full_path)
             while not os.path.exists(full_path):
                 logger.info(
                     '################## Not Found: %s' %
