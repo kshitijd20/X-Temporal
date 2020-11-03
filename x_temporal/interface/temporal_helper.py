@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from torch.nn.utils import clip_grad_norm_
 from torch.utils.data.distributed import DistributedSampler
+from torch.utils.data import SequentialSampler
 from tensorboardX import SummaryWriter
 
 from x_temporal.utils.log_helper import init_log, get_log_format
@@ -149,7 +150,8 @@ class TemporalHelper(object):
             ])
 
             dataset = get_dataset(dargs, data_type, True, transform, data_length, temporal_samples)
-            sampler = DistributedSampler(dataset) if self.config.gpus  > 1 else None
+            #sampler = DistributedSampler(dataset) if self.config.gpus  > 1 else None
+            sampler = SequentialSampler(dataset)
             val_loader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size=dargs.batch_size, shuffle=(False if sampler else True),
