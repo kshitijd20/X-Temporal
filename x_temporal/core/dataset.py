@@ -129,6 +129,7 @@ class VideoDataSet(data.Dataset):
         tmp = [x.strip().split(' ') for x in open(self.list_file)]
         if not self.test_mode or self.remove_missing:
             tmp = [item for item in tmp if int(item[1]) >= 3]
+        print("Video list is ",tmp)
         self.video_list = [VideoRecord(item) for item in tmp]
         print("Video list is ", self.video_list)
 
