@@ -497,7 +497,7 @@ class TemporalHelper(object):
 
     def load_pretrain_or_resume(self):
         if 'resume_model' in self.config.saver:
-            self.logger.info('Load checkpoint from {}'.format(self.config.saver['resume_model']))
+            self.logger.info('Resuming checkpoint from {}'.format(self.config.saver['resume_model']))
             return load_checkpoint(self.config.saver['resume_model'])
         elif 'pretrain_model' in self.config.saver:
             state = load_checkpoint(self.config.saver['pretrain_model'])
