@@ -510,7 +510,7 @@ class TemporalHelper(object):
         test_loader = self.data_loaders['test']
         test_len = len(test_loader)
         end = time.time()
-        layer_list = ['s3']
+        layer_list = ['s1', 's2','s3', 's4','s5']
         print("Number of videos are :",test_len )
         num_perm = 10
         for iter_idx in (range(test_len)):
@@ -534,9 +534,10 @@ class TemporalHelper(object):
                 inputs[0] = inputs[0][:,:,perm_indices]
                 activations, output = self.model(inputs[0],return_activations = True)
                 for layer,activation in zip(layer_list,activations):
-                    activations_save_path = os.path.join(activations_dir,str(iter_idx).zfill(4) + "_" + layer + "_" + str(perm).zfill(2) +".npy")
-                    #print(iter_idx, activation.shape)
-                    np.save(activations_save_path,activation.cpu().detach().numpy())
+                    if layer == 's3': # This layer showed the higest prediction of neural data
+                        activations_save_path = os.path.join(activations_dir,str(iter_idx).zfill(4) + "_" + layer + "_" + str(perm).zfill(2) +".npy")
+                        #print(iter_idx, activation.shape)
+                        np.save(activations_save_path,activation.cpu().detach().numpy())
                 osizes = output.shape
         return None
 
