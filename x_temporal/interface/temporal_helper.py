@@ -534,7 +534,7 @@ class TemporalHelper(object):
                 inputs[0] = inputs[0][:,:,perm_indices]
                 activations, output = self.model(inputs[0],return_activations = True)
                 for layer,activation in zip(layer_list,activations):
-                    if layer == 's3': # This layer showed the higest prediction of neural data
+                    if True: #layer == 's3': # This layer showed the higest prediction of neural data
                         activations_save_path = os.path.join(activations_dir,str(iter_idx).zfill(4) + "_" + layer + "_" + str(perm).zfill(2) +".npy")
                         #print(iter_idx, activation.shape)
                         np.save(activations_save_path,activation.cpu().detach().numpy())
