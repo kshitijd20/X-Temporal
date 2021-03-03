@@ -17,15 +17,16 @@ from torch.utils.cpp_extension import CUDAExtension
 
 def _find_cuda_home():
     # guess rule 3 of torch.utils.cpp_extension
+    nvcc = subprocess.check_output(['which', 'nvcc']).decode()
     nvcc = subprocess.check_output(['which', 'nvcc']).decode().rstrip('\r\n')
-    cuda_home = os.path.dirname(os.path.dirname(nvcc))
+    cuda_home = 'C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2'#os.path.dirname(os.path.dirname(nvcc))
     print(f'find cuda home:{cuda_home}')
     return cuda_home
 
 
 # remember to overwrite PyTorch auto-detected cuda home which
 # may not be our expected
-torch.utils.cpp_extension.CUDA_HOME = _find_cuda_home()
+#torch.utils.cpp_extension.CUDA_HOME = _find_cuda_home()
 CUDA_HOME = torch.utils.cpp_extension.CUDA_HOME
 
 CORE_DIR = 'x_temporal'
@@ -98,6 +99,3 @@ setup(
     ext_modules=get_extensions(),
     cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
 )
-
-
-

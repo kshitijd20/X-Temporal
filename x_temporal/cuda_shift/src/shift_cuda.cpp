@@ -15,7 +15,7 @@ at::Tensor shift_featuremap_cuda_forward(const at::Tensor &data, const at::Tenso
     int hwsize = data.size(3);
     int groupsize = shift.size(1);
 
-    ShiftDataCudaForward(THCState_getCurrentStream(state),
+    ShiftDataCudaForward(at::cuda::getCurrentCUDAStream(),
                         data.data<float>(),
                         shift.data<int>(),
                         batch_size,
@@ -38,7 +38,7 @@ at::Tensor shift_featuremap_cuda_backward(const at::Tensor &grad_output, const a
     int hwsize = grad_output.size(3);
     int groupsize = shift.size(1);
 
-    ShiftDataCudaBackward(THCState_getCurrentStream(state),
+    ShiftDataCudaBackward(at::cuda::getCurrentCUDAStream(),
                         grad_output.data<float>(),
                         shift.data<int>(),
                         batch_size,
@@ -54,4 +54,3 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("shift_featuremap_cuda_forward", &shift_featuremap_cuda_forward, "shift_featuremap_cuda_forward");
   m.def("shift_featuremap_cuda_backward", &shift_featuremap_cuda_backward, "shift_featuremap_cuda_backward");
 }
-
