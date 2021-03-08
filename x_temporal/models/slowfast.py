@@ -96,12 +96,16 @@ class SlowFast(nn.Module):
         self.dp = nn.Dropout(dropout)
         self.fc = nn.Linear(self.fast_inplanes+2048, num_classes, bias=False)
 
-    def forward(self, input, return_activations=False):
+    def forward(self, input, return_activations=False,return_mid='slow_res5'):
         fast, lateral = self.FastPath(input[:, :, ::1, :, :])
         if return_activations:
-            activations,slow = self.SlowPath(input[:, :, ::4, :, :], lateral,return_activations=return_activations)
+            activations,slow = self.SlowPath(input[:, :, ::4, :, :], lateral,return_activations=return_activations,return_mid=return_mid)
+            if return_mid is not None:
+                return slow
         else:
-            slow = self.SlowPath(input[:, :, ::4, :, :], lateral,return_activations=return_activations)
+            slow = self.SlowPath(input[:, :, ::4, :, :], lateral,return_activations=return_activations,return_mid=return_mid)
+            if return_mid is not None:
+                return slow
         x = torch.cat([slow, fast], dim=1)
         x = self.dp(x)
         x = self.fc(x)
@@ -112,7 +116,7 @@ class SlowFast(nn.Module):
 
 
 
-    def SlowPath(self, input, lateral, return_activations=False):
+    def SlowPath(self, input, lateral, return_activations=False, return_mid=False):
         activations = []
         x = self.slow_conv1(input)
         x = self.slow_bn1(x)
@@ -130,10 +134,14 @@ class SlowFast(nn.Module):
         x = self.slow_res4(x)
         if return_activations:
             activations.append(x)
+        if return_mid =='slow_res4':
+            return x
         x = torch.cat([x, lateral[3]],dim=1)
         x = self.slow_res5(x)
         if return_activations:
             activations.append(x)
+        if return_mid=='slow_res5':
+            return x
         x = nn.AdaptiveAvgPool3d(1)(x)
         x = x.view(-1, x.size(1))
         if return_activations:

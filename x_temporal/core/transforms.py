@@ -90,8 +90,7 @@ class GroupRandomHorizontalFlip(object):
         else:
             return img_group
 
-
-class GroupNormalize(object):
+class GroupDenormalize(object):
     def __init__(self, mean, std):
         self.mean = mean
         self.std = std
@@ -99,6 +98,28 @@ class GroupNormalize(object):
     def __call__(self, tensor):
         rep_mean = self.mean * (tensor.size()[0] // len(self.mean))
         rep_std = self.std * (tensor.size()[0] // len(self.std))
+
+        # TODO: make efficient
+        for t, m, s in zip(tensor, rep_mean, rep_std):
+            t.mul_(s).add_(s)
+
+        return tensor
+class GroupNormalize(object):
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, tensor):
+
+        print("self mean is ", self.mean)
+        print("self std is ", self.std)
+
+        rep_mean = self.mean * (tensor.size()[0] // len(self.mean))
+        rep_std = self.std * (tensor.size()[0] // len(self.std))
+
+        print("rep mean is ", len(rep_mean))
+        print("rep std is ", len(rep_std))
+        print("tensor shape is ", tensor.shape)
 
         # TODO: make efficient
         for t, m, s in zip(tensor, rep_mean, rep_std):
