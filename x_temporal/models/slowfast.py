@@ -119,11 +119,16 @@ class SlowFast(nn.Module):
     def SlowPath(self, input, lateral, return_activations=False, return_mid=False):
         activations = []
         x = self.slow_conv1(input)
+        if return_mid=='slow_conv1':
+            return x
+
         x = self.slow_bn1(x)
         x = self.slow_relu(x)
         x = self.slow_maxpool(x)
         x = torch.cat([x, lateral[0]],dim=1)
         x = self.slow_res2(x)
+        if return_mid=='slow_res2':
+            return x
         if return_activations:
             activations.append(x)
         x = torch.cat([x, lateral[1]],dim=1)
