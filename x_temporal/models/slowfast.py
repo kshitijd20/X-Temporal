@@ -133,6 +133,8 @@ class SlowFast(nn.Module):
             activations.append(x)
         x = torch.cat([x, lateral[1]],dim=1)
         x = self.slow_res3(x)
+        if return_mid=='slow_res3':
+            return x
         if return_activations:
             activations.append(x)
         x = torch.cat([x, lateral[2]],dim=1)
